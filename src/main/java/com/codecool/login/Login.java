@@ -4,6 +4,7 @@ import com.codecool.login.cookies.CookieHelper;
 import com.codecool.login.helpers.LoginHelper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 import org.jtwig.JtwigModel;
 import org.jtwig.JtwigTemplate;
 
@@ -18,6 +19,7 @@ public class Login implements HttpHandler {
     int counter = 0;
     CookieHelper cookieHelper = new CookieHelper();
     LoginHelper loginHelper = new LoginHelper();
+    DB db = new DB();
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -25,15 +27,24 @@ public class Login implements HttpHandler {
         String method = httpExchange.getRequestMethod();
         String requestURI = httpExchange.getRequestURI().toString();
 
-        if (!cookie.isPresent()) {
-            createCookie(httpExchange);
-        }
+//        if (!cookie.isPresent()) {
+//            createCookie(httpExchange);
+//        } else {
+//            sayHello(httpExchange);
+//        }
+
         if (method.equals("POST")) {
             postForm(httpExchange);
         }
-        else if (method.equals("GET")) {
+        else if (method.equals("GET") && cookie.isPresent()) {
+            sayHello(httpExchange);
+        } else {
             getForm(httpExchange);
         }
+    }
+
+    private void sayHello(HttpExchange httpExchange) {
+
     }
 
     private void createCookie(HttpExchange httpExchange) {
@@ -54,13 +65,31 @@ public class Login implements HttpHandler {
     private void postForm(HttpExchange httpExchange) throws IOException {
         String response;
         Map<String, String> inputs = loginHelper.getInputs(httpExchange);
+        if (!areCredentialsValid(inputs)){
+            invalidAlert(httpExchange);
+            return;
+        }
         JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/logged-page.twig");
         JtwigModel model = JtwigModel.newModel();
         String userName = inputs.get("username");
         System.out.println(userName);
         model.with("username", userName);
+        createCookie(httpExchange);
         response = template.render(model);
         loginHelper.send200(httpExchange, response);
+    }
+
+    private void invalidAlert(HttpExchange httpExchange) throws IOException {
+        String response = "Invalid login data";
+        loginHelper.send200(httpExchange, response);
+    }
+
+    private boolean areCredentialsValid(Map<String, String> inputs) {
+        String providedName = inputs.get("username");
+        String providedPassword = inputs.get("password");
+        List<User> users = db.getUserList();
+        User user = users.stream().filter(u -> u.getUserName().equals(providedName)).findFirst().orElse(null);
+        return (user != null) && user.getPassword().equals(providedPassword);
     }
 
 
