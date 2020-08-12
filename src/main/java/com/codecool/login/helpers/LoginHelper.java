@@ -1,5 +1,6 @@
 package com.codecool.login.helpers;
 
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.*;
@@ -39,5 +40,11 @@ public class LoginHelper {
             map.put(key, value);
         }
         return map;
+    }
+
+    public void redirectHome(HttpExchange httpExchange) throws IOException {
+        Headers responseHeaders = httpExchange.getResponseHeaders();
+        responseHeaders.set("Location", "/login");
+        httpExchange.sendResponseHeaders(302, 0);
     }
 }

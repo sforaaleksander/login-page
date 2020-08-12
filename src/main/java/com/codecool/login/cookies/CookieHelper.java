@@ -1,5 +1,9 @@
 package com.codecool.login.cookies;
 
+import com.codecool.login.helpers.LoginHelper;
+import com.sun.net.httpserver.HttpExchange;
+
+import java.io.IOException;
 import java.net.HttpCookie;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,5 +31,16 @@ public class CookieHelper {
                 return Optional.ofNullable(cookie);
         }
         return Optional.empty();
+    }
+
+    public void removeCookieByName(String cookieName, HttpExchange httpExchange) throws IOException {
+        String response = "logged out";
+        HttpCookie cookie;
+        cookie = new HttpCookie(cookieName, "");
+        System.out.println(cookieName);
+        cookie.setMaxAge(0);
+        httpExchange.getResponseHeaders().add("Set-Cookie", cookie.toString());
+        System.out.println("removed cookie");
+        new LoginHelper().send200(httpExchange, response);
     }
 }
