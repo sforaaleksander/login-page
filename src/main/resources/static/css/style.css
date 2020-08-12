@@ -1,0 +1,37 @@
+form {
+    display: flex;
+    flex-direction: column;
+    width: 30vw;
+}
+
+form > div {
+    margin-bottom: 1em;
+}
+
+button {
+    width: 10vw;
+}
+
+input {
+    width: 18vw;
+}
+
+form > div {
+    display: flex;
+    flex-direction: column;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: solid 0.5em darkgray;
+    padding: 1.8em;
+}
+
+body {
+    height: 97vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
