@@ -38,4 +38,15 @@ public class CookieHelper {
         String cookieString = cookie.get().toString();
         httpExchange.getResponseHeaders().add("Set-Cookie", cookieString);
     }
+
+    public int getSessionIdFromCookie(HttpCookie cookie) {
+        String value = cookie.getValue().replace("\"", "");
+        return Integer.parseInt(value);
+    }
+
+    public Optional<HttpCookie> getSessionIdCookie(HttpExchange httpExchange, String name) {
+        String cookieStr = httpExchange.getRequestHeaders().getFirst("Cookie");
+        List<HttpCookie> cookies = parseCookies(cookieStr);
+        return findCookieByName(name, cookies);
+    }
 }

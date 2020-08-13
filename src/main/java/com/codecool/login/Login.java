@@ -9,7 +9,6 @@ import org.jtwig.JtwigTemplate;
 
 import java.io.*;
 import java.net.HttpCookie;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,18 +36,13 @@ public class Login implements HttpHandler {
     }
 
     private void handleGet(HttpExchange httpExchange) throws IOException {
-        Optional<HttpCookie> optionalCookie = getSessionIdCookie(httpExchange);
+        Optional<HttpCookie> optionalCookie = cookieHelper.getSessionIdCookie(httpExchange, SESSION_COOKIE_NAME);
         if (optionalCookie.isPresent()) {
-            int sessionId = getSessionIdFromCookie(optionalCookie.get());
+            int sessionId = cookieHelper.getSessionIdFromCookie(optionalCookie.get());
             sayHello(httpExchange, sessionId);
         } else {
             getForm(httpExchange);
         }
-    }
-
-    private int getSessionIdFromCookie(HttpCookie cookie) {
-        String value = cookie.getValue().replace("\"", "");
-        return Integer.parseInt(value);
     }
 
     private void sayHello(HttpExchange httpExchange, int sessionId) throws IOException {
@@ -66,8 +60,8 @@ public class Login implements HttpHandler {
 
     private void postForm(HttpExchange httpExchange) throws IOException {
         Map<String, String> inputs = loginHelper.getInputs(httpExchange);
-        if (!areCredentialsValid(inputs)) {
-            invalidAlert(httpExchange);
+        if (!loginHelper.areCredentialsValid(inputs, db)) {
+            loginHelper.invalidAlert(httpExchange);
             return;
         }
         String sessionId = String.valueOf(counter);
@@ -85,23 +79,5 @@ public class Login implements HttpHandler {
         model.with("username", user.getUserName());
         response = template.render(model);
         loginHelper.send200(httpExchange, response);
-    }
-
-    private void invalidAlert(HttpExchange httpExchange) throws IOException {
-        String response = "Invalid login data";
-        loginHelper.send200(httpExchange, response);
-    }
-
-    private boolean areCredentialsValid(Map<String, String> inputs) {
-        String providedName = inputs.get("username");
-        String providedPassword = inputs.get("password");
-        User user = db.getUserByProvidedName(providedName);
-        return (user != null) && user.getPassword().equals(providedPassword);
-    }
-
-    private Optional<HttpCookie> getSessionIdCookie(HttpExchange httpExchange) {
-        String cookieStr = httpExchange.getRequestHeaders().getFirst("Cookie");
-        List<HttpCookie> cookies = cookieHelper.parseCookies(cookieStr);
-        return cookieHelper.findCookieByName(SESSION_COOKIE_NAME, cookies);
     }
 }

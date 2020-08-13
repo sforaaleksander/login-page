@@ -1,5 +1,7 @@
 package com.codecool.login.helpers;
 
+import com.codecool.login.DB;
+import com.codecool.login.User;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.*;
@@ -38,5 +40,17 @@ public class LoginHelper {
             map.put(key, value);
         }
         return map;
+    }
+
+    public void invalidAlert(HttpExchange httpExchange) throws IOException {
+        String response = "Invalid login data";
+        send200(httpExchange, response);
+    }
+
+    public boolean areCredentialsValid(Map<String, String> inputs, DB db) {
+        String providedName = inputs.get("username");
+        String providedPassword = inputs.get("password");
+        User user = db.getUserByProvidedName(providedName);
+        return (user != null) && user.getPassword().equals(providedPassword);
     }
 }
