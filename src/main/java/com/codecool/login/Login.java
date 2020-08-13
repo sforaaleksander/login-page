@@ -15,7 +15,7 @@ import java.util.Optional;
 
 public class Login implements HttpHandler {
     private static final String SESSION_COOKIE_NAME = "sessionId";
-    int counter = 0;
+    static int counter = 0;
     CookieHelper cookieHelper = new CookieHelper();
     LoginHelper loginHelper = new LoginHelper();
     DB db = new DB();
@@ -35,15 +35,18 @@ public class Login implements HttpHandler {
 
 
     private void handleGet(HttpExchange httpExchange) throws IOException {
-        Optional<HttpCookie> cookie = getSessionIdCookie(httpExchange);
-        if (cookie.isPresent()){
-            String value = cookie.get().getValue().replace("\"","");
-
-            int sessionId = Integer.parseInt(value);
+        Optional<HttpCookie> optionalCookie = getSessionIdCookie(httpExchange);
+        if (optionalCookie.isPresent()){
+            int sessionId = getSessionIdFromCookie(optionalCookie.get());
             sayHello(httpExchange, sessionId);
         } else {
             getForm(httpExchange);
         }
+    }
+
+    private int getSessionIdFromCookie(HttpCookie cookie) {
+        String value = cookie.getValue().replace("\"","");
+        return Integer.parseInt(value);
     }
 
     private void sayHello(HttpExchange httpExchange, int sessionId) throws IOException {
@@ -75,8 +78,11 @@ public class Login implements HttpHandler {
             invalidAlert(httpExchange);
             return;
         }
+        createCookie(httpExchange);
         User user = getUserByProvidedName(inputs.get("username"));
+        db.getSessionUserMap().put(counter, user);
         modelPageWithName(httpExchange, user);
+        counter++;
     }
 
     private void modelPageWithName(HttpExchange httpExchange, User user) throws IOException {
@@ -84,7 +90,6 @@ public class Login implements HttpHandler {
         JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/logged-page.twig");
         JtwigModel model = JtwigModel.newModel();
         model.with("username", user.getUserName());
-        createCookie(httpExchange);
         response = template.render(model);
         loginHelper.send200(httpExchange, response);
     }
