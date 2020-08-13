@@ -15,10 +15,16 @@ import java.util.Optional;
 
 public class Login implements HttpHandler {
     private static final String SESSION_COOKIE_NAME = "sessionId";
-    static int counter = 0;
-    CookieHelper cookieHelper = new CookieHelper();
-    LoginHelper loginHelper = new LoginHelper();
-    DB db = new DB();
+    private static int counter = 0;
+    private final CookieHelper cookieHelper;
+    private final LoginHelper loginHelper;
+    private final DB db;
+
+    public Login(DB db) {
+        this.db = db;
+        this.cookieHelper = new CookieHelper();
+        this.loginHelper = new LoginHelper();
+    }
 
     @Override
     public void handle(HttpExchange httpExchange) {
