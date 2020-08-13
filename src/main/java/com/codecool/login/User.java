@@ -1,9 +1,8 @@
 package com.codecool.login;
 
 public class User {
-    private String userName;
-    private String password;
-    private int sessionId;
+    private final String userName;
+    private final String password;
 
     public User(String userName, String password) {
         this.userName = userName;
@@ -14,23 +13,7 @@ public class User {
         return userName;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
     public String getPassword() {
         return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public int getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(int sessionId) {
-        this.sessionId = sessionId;
     }
 }

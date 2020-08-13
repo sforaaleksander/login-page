@@ -21,21 +21,23 @@ public class Login implements HttpHandler {
     DB db = new DB();
 
     @Override
-    public void handle(HttpExchange httpExchange) throws IOException {
+    public void handle(HttpExchange httpExchange) {
         String method = httpExchange.getRequestMethod();
-        String requestURI = httpExchange.getRequestURI().toString();
-        System.out.println(requestURI);
 
-        if (method.equals("POST")) {
-            postForm(httpExchange);
-        } else if (method.equals("GET")) {
-            handleGet(httpExchange);
+        try {
+            if (method.equals("POST")) {
+                postForm(httpExchange);
+            } else if (method.equals("GET")) {
+                handleGet(httpExchange);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     private void handleGet(HttpExchange httpExchange) throws IOException {
         Optional<HttpCookie> optionalCookie = getSessionIdCookie(httpExchange);
-        if (optionalCookie.isPresent()){
+        if (optionalCookie.isPresent()) {
             int sessionId = getSessionIdFromCookie(optionalCookie.get());
             sayHello(httpExchange, sessionId);
         } else {
@@ -44,7 +46,7 @@ public class Login implements HttpHandler {
     }
 
     private int getSessionIdFromCookie(HttpCookie cookie) {
-        String value = cookie.getValue().replace("\"","");
+        String value = cookie.getValue().replace("\"", "");
         return Integer.parseInt(value);
     }
 
@@ -58,9 +60,8 @@ public class Login implements HttpHandler {
         String sessionId = String.valueOf(counter);
         cookie = Optional.of(new HttpCookie(SESSION_COOKIE_NAME, sessionId));
         cookie.get().setPath("/login/");
-        String s = cookie.get().toString();
-        System.out.println("created: " + s);
-        httpExchange.getResponseHeaders().add("Set-Cookie", s);
+        String cookieString = cookie.get().toString();
+        httpExchange.getResponseHeaders().add("Set-Cookie", cookieString);
     }
 
     private void getForm(HttpExchange httpExchange) throws IOException {
