@@ -20,7 +20,11 @@ public class DB {
         return sessionUserMap;
     }
 
-    public List<User> getUserList() {
-        return userList;
+    public User getUserBySessionId(int sessionId) {
+        return sessionUserMap.get(sessionId);
+    }
+
+    public User getUserByProvidedName(String providedName) {
+        return userList.stream().filter(u -> u.getUserName().equals(providedName)).findFirst().orElse(null);
     }
 }

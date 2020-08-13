@@ -52,7 +52,7 @@ public class Login implements HttpHandler {
     }
 
     private void sayHello(HttpExchange httpExchange, int sessionId) throws IOException {
-        User user = getUserBySessionId(sessionId);
+        User user = db.getUserBySessionId(sessionId);
         modelPageWithName(httpExchange, user);
     }
 
@@ -72,7 +72,7 @@ public class Login implements HttpHandler {
         }
         String sessionId = String.valueOf(counter);
         cookieHelper.createCookie(httpExchange, SESSION_COOKIE_NAME, sessionId);
-        User user = getUserByProvidedName(inputs.get("username"));
+        User user = db.getUserByProvidedName(inputs.get("username"));
         db.getSessionUserMap().put(counter, user);
         modelPageWithName(httpExchange, user);
         counter++;
@@ -95,17 +95,8 @@ public class Login implements HttpHandler {
     private boolean areCredentialsValid(Map<String, String> inputs) {
         String providedName = inputs.get("username");
         String providedPassword = inputs.get("password");
-        User user = getUserByProvidedName(providedName);
+        User user = db.getUserByProvidedName(providedName);
         return (user != null) && user.getPassword().equals(providedPassword);
-    }
-
-    private User getUserByProvidedName(String providedName) {
-        List<User> users = db.getUserList();
-        return users.stream().filter(u -> u.getUserName().equals(providedName)).findFirst().orElse(null);
-    }
-
-    private User getUserBySessionId(int sessionId) {
-        return db.getSessionUserMap().get(sessionId);
     }
 
     private Optional<HttpCookie> getSessionIdCookie(HttpExchange httpExchange) {
