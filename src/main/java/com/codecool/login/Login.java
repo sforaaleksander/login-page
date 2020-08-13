@@ -26,17 +26,8 @@ public class Login implements HttpHandler {
         Optional<HttpCookie> cookie = getSessionIdCookie(httpExchange);
         String method = httpExchange.getRequestMethod();
         String requestURI = httpExchange.getRequestURI().toString();
-
-//        if (!cookie.isPresent()) {
-//            createCookie(httpExchange);
-//        } else {
-//            sayHello(httpExchange);
-//        }
         System.out.println(requestURI);
-        if(requestURI.contains("logout")){
-           cookieHelper.removeCookieByName(SESSION_COOKIE_NAME, httpExchange);
-           loginHelper.redirectHome(httpExchange);
-        }
+
         if (method.equals("POST")) {
             postForm(httpExchange);
         }
@@ -59,7 +50,12 @@ public class Login implements HttpHandler {
         Optional<HttpCookie> cookie;
         String sessionId = String.valueOf(counter);
         cookie = Optional.of(new HttpCookie(SESSION_COOKIE_NAME, sessionId));
-        httpExchange.getResponseHeaders().add("Set-Cookie", cookie.get().toString());
+        cookie.get().setPath("/login/");
+        String s = cookie.get().toString();
+        System.out.println("created: " + s);
+        httpExchange.getResponseHeaders().add("Set-Cookie", s);
+//        String test = "test=\"check\";$Path=\"/login/\"";
+//        httpExchange.getResponseHeaders().add("Set-Cookie", test);
     }
 
     private void getForm(HttpExchange httpExchange) throws IOException {
