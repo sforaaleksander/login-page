@@ -33,7 +33,6 @@ public class Login implements HttpHandler {
         }
     }
 
-
     private void handleGet(HttpExchange httpExchange) throws IOException {
         Optional<HttpCookie> optionalCookie = getSessionIdCookie(httpExchange);
         if (optionalCookie.isPresent()){
@@ -112,10 +111,8 @@ public class Login implements HttpHandler {
     }
 
     private User getUserBySessionId(int sessionId) {
-        List<User> users = db.getUserList();
-        return users.stream().filter(u -> u.getSessionId() == sessionId).findFirst().orElse(null);
+        return db.getSessionUserMap().get(sessionId);
     }
-
 
     private Optional<HttpCookie> getSessionIdCookie(HttpExchange httpExchange) {
         String cookieStr = httpExchange.getRequestHeaders().getFirst("Cookie");
