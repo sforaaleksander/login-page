@@ -27,17 +27,12 @@ public class Login implements HttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange httpExchange) {
+    public void handle(HttpExchange httpExchange) throws IOException {
         String method = httpExchange.getRequestMethod();
-
-        try {
-            if (method.equals("POST")) {
-                postForm(httpExchange);
-            } else if (method.equals("GET")) {
-                handleGet(httpExchange);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (method.equals("POST")) {
+            postForm(httpExchange);
+        } else if (method.equals("GET")) {
+            handleGet(httpExchange);
         }
     }
 
@@ -61,15 +56,6 @@ public class Login implements HttpHandler {
         modelPageWithName(httpExchange, user);
     }
 
-    private void createCookie(HttpExchange httpExchange) {
-        Optional<HttpCookie> cookie;
-        String sessionId = String.valueOf(counter);
-        cookie = Optional.of(new HttpCookie(SESSION_COOKIE_NAME, sessionId));
-        cookie.get().setPath("/login/");
-        String cookieString = cookie.get().toString();
-        httpExchange.getResponseHeaders().add("Set-Cookie", cookieString);
-    }
-
     private void getForm(HttpExchange httpExchange) throws IOException {
         String response;
         JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/main-page.twig");
@@ -84,7 +70,8 @@ public class Login implements HttpHandler {
             invalidAlert(httpExchange);
             return;
         }
-        createCookie(httpExchange);
+        String sessionId = String.valueOf(counter);
+        cookieHelper.createCookie(httpExchange, SESSION_COOKIE_NAME, sessionId);
         User user = getUserByProvidedName(inputs.get("username"));
         db.getSessionUserMap().put(counter, user);
         modelPageWithName(httpExchange, user);

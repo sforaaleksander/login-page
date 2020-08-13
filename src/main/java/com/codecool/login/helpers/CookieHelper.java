@@ -1,5 +1,7 @@
 package com.codecool.login.helpers;
 
+import com.sun.net.httpserver.HttpExchange;
+
 import java.net.HttpCookie;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,5 +29,13 @@ public class CookieHelper {
                 return Optional.of(cookie);
         }
         return Optional.empty();
+    }
+
+    public void createCookie(HttpExchange httpExchange, String name, String value) {
+        Optional<HttpCookie> cookie;
+        cookie = Optional.of(new HttpCookie(name, value));
+        cookie.get().setPath("/login/");
+        String cookieString = cookie.get().toString();
+        httpExchange.getResponseHeaders().add("Set-Cookie", cookieString);
     }
 }
