@@ -22,20 +22,34 @@ public class Login implements HttpHandler {
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
-        Optional<HttpCookie> cookie = getSessionIdCookie(httpExchange);
         String method = httpExchange.getRequestMethod();
         String requestURI = httpExchange.getRequestURI().toString();
         System.out.println(requestURI);
 
         if (method.equals("POST")) {
             postForm(httpExchange);
+        } else if (method.equals("GET")) {
+            handleGet(httpExchange);
         }
-        else if (method.equals("GET") && cookie.isPresent()) {
+    }
+
+//        else if (method.equals("GET") && cookie.isPresent()) {
+//            int sessionId = Integer.parseInt(cookie.get().getValue());
+//            System.out.println(sessionId);
+//            sayHello(httpExchange, sessionId);
+//        }
+//        else {
+//            getForm(httpExchange);
+//        }
+//    }
+
+    private void handleGet(HttpExchange httpExchange) throws IOException {
+        Optional<HttpCookie> cookie = getSessionIdCookie(httpExchange);
+        if (cookie.isPresent()){
             int sessionId = Integer.parseInt(cookie.get().getValue());
             System.out.println(sessionId);
             sayHello(httpExchange, sessionId);
-        }
-        else {
+        } else {
             getForm(httpExchange);
         }
     }
@@ -53,8 +67,6 @@ public class Login implements HttpHandler {
         String s = cookie.get().toString();
         System.out.println("created: " + s);
         httpExchange.getResponseHeaders().add("Set-Cookie", s);
-//        String test = "test=\"check\";$Path=\"/login/\"";
-//        httpExchange.getResponseHeaders().add("Set-Cookie", test);
     }
 
     private void getForm(HttpExchange httpExchange) throws IOException {
@@ -67,7 +79,7 @@ public class Login implements HttpHandler {
 
     private void postForm(HttpExchange httpExchange) throws IOException {
         Map<String, String> inputs = loginHelper.getInputs(httpExchange);
-        if (!areCredentialsValid(inputs)){
+        if (!areCredentialsValid(inputs)) {
             invalidAlert(httpExchange);
             return;
         }
@@ -108,7 +120,7 @@ public class Login implements HttpHandler {
     }
 
 
-    private Optional<HttpCookie> getSessionIdCookie(HttpExchange httpExchange){
+    private Optional<HttpCookie> getSessionIdCookie(HttpExchange httpExchange) {
         String cookieStr = httpExchange.getRequestHeaders().getFirst("Cookie");
         List<HttpCookie> cookies = cookieHelper.parseCookies(cookieStr);
         return cookieHelper.findCookieByName(SESSION_COOKIE_NAME, cookies);
