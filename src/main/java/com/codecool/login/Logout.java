@@ -18,11 +18,7 @@ public class Logout implements HttpHandler {
 
         Headers responseHeaders = exchange.getResponseHeaders();
         responseHeaders.add("Location", "login");
-        try {
-            exchange.sendResponseHeaders(302, -1);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        exchange.sendResponseHeaders(302, -1);
         exchange.close();
     }
 }

@@ -33,21 +33,13 @@ public class Login implements HttpHandler {
         }
     }
 
-//        else if (method.equals("GET") && cookie.isPresent()) {
-//            int sessionId = Integer.parseInt(cookie.get().getValue());
-//            System.out.println(sessionId);
-//            sayHello(httpExchange, sessionId);
-//        }
-//        else {
-//            getForm(httpExchange);
-//        }
-//    }
 
     private void handleGet(HttpExchange httpExchange) throws IOException {
         Optional<HttpCookie> cookie = getSessionIdCookie(httpExchange);
         if (cookie.isPresent()){
-            int sessionId = Integer.parseInt(cookie.get().getValue());
-            System.out.println(sessionId);
+            String value = cookie.get().getValue().replace("\"","");
+
+            int sessionId = Integer.parseInt(value);
             sayHello(httpExchange, sessionId);
         } else {
             getForm(httpExchange);
