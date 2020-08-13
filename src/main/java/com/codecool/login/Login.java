@@ -1,10 +1,9 @@
 package com.codecool.login;
 
-import com.codecool.login.cookies.CookieHelper;
+import com.codecool.login.helpers.CookieHelper;
 import com.codecool.login.helpers.LoginHelper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
 import org.jtwig.JtwigModel;
 import org.jtwig.JtwigTemplate;
 

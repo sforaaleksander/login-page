@@ -34,7 +34,6 @@ public class LoginHelper {
         String[] pairs = formData.split("&");
         for (String pair : pairs) {
             String[] keyValue = pair.split("=");
-            // We have to decode the value because it's urlencoded. see: https://en.wikipedia.org/wiki/POST_(HTTP)#Use_for_submitting_web_forms
             String key = URLDecoder.decode(keyValue[0], "UTF-8");
             String value = URLDecoder.decode(keyValue[1], "UTF-8");
             map.put(key, value);

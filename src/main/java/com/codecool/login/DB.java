@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DB {
-    private List<User> userList;
+    private final List<User> userList;
 
     public DB() {
         this.userList = new ArrayList<>();
