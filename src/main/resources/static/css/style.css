@@ -35,3 +35,11 @@ body {
     justify-content: center;
     align-items: center;
 }
+
+a {
+    color:black;
+}
+
+a:visited {
+    color:black;
+}
